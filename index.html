@@ -669,6 +669,152 @@
         max-width: 700px;
       }
 
+
+      /* ==============================
+         TASHKENT WEATHER
+      ============================== */
+
+      .weather-section {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .weather-panel {
+        max-width: 1100px;
+        margin: 0 auto;
+        border: 7px solid #000;
+        background: #fff;
+        box-shadow: 14px 14px 0 #000;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .weather-main {
+        padding: 45px;
+        background: #f4f4f4;
+        border-right: 6px solid #000;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .weather-stamp {
+        display: inline-block;
+        background: #000;
+        color: #fff;
+        padding: 7px 13px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        transform: rotate(-2deg);
+      }
+
+      .weather-city {
+        font-family: "Anton", sans-serif;
+        font-size: clamp(38px, 5vw, 65px);
+        line-height: 1;
+        margin-top: 25px;
+        text-transform: uppercase;
+      }
+
+      .weather-temperature {
+        font-family: "Anton", sans-serif;
+        font-size: clamp(85px, 12vw, 145px);
+        line-height: 1;
+        margin: 15px 0 5px;
+        letter-spacing: -5px;
+      }
+
+      .weather-description {
+        font-size: 24px;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+
+      .weather-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0;
+      }
+
+      .weather-detail {
+        padding: 30px;
+        min-height: 135px;
+        border-bottom: 5px solid #000;
+      }
+
+      .weather-detail:nth-child(odd) {
+        border-right: 5px solid #000;
+      }
+
+      .weather-detail:nth-last-child(-n+2) {
+        border-bottom: 0;
+      }
+
+      .weather-detail span {
+        display: block;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        opacity: .65;
+        margin-bottom: 10px;
+      }
+
+      .weather-detail strong {
+        font-family: "Anton", sans-serif;
+        font-size: 34px;
+      }
+
+      .weather-updated {
+        margin-top: 22px;
+        font-size: 14px;
+        font-weight: 600;
+        opacity: .7;
+      }
+
+      .weather-refresh {
+        margin-top: 22px;
+        padding: 12px 20px;
+        border: 3px solid #000;
+        background: #000;
+        color: #fff;
+        font: 700 15px "Oswald", sans-serif;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: .2s;
+      }
+
+      .weather-refresh:hover {
+        background: #fff;
+        color: #000;
+      }
+
+      .weather-error {
+        margin-top: 12px;
+        font-weight: 600;
+      }
+
+      @media (max-width: 700px) {
+        .weather-panel {
+          grid-template-columns: 1fr;
+        }
+
+        .weather-main {
+          padding: 30px 22px;
+          border-right: 0;
+          border-bottom: 6px solid #000;
+        }
+
+        .weather-detail {
+          padding: 22px 16px;
+          min-height: 115px;
+        }
+
+        .weather-detail strong {
+          font-size: 28px;
+        }
+      }
+
       /* ==============================
        FOOTER
     ============================== */
@@ -866,6 +1012,7 @@
         <li><a href="#home">Главная</a></li>
         <li><a href="#comics">Комиксы</a></li>
         <li><a href="#story">История</a></li>
+        <li><a href="#weather">Погода</a></li>
         <li><a href="#contact">Контакты</a></li>
       </ul>
     </nav>
@@ -1027,6 +1174,48 @@
         </div>
       </section>
 
+
+      <!-- TASHKENT WEATHER -->
+      <section class="weather-section" id="weather">
+        <div class="section-title reveal">
+          <p>Live data / Tashkent</p>
+          <h2>City weather</h2>
+        </div>
+
+        <div class="weather-panel reveal">
+          <div class="weather-main">
+            <span class="weather-stamp">LIVE WEATHER</span>
+            <h3 class="weather-city">Tashkent / Uzbekistan</h3>
+            <div class="weather-temperature" id="weatherTemp">--°</div>
+            <p class="weather-description" id="weatherDescription">Загрузка погоды...</p>
+            <p class="weather-updated" id="weatherUpdated">Получаем актуальные данные</p>
+            <button class="weather-refresh hover-target" id="weatherRefresh" type="button">
+              Обновить погоду
+            </button>
+            <p class="weather-error" id="weatherError" role="status"></p>
+          </div>
+
+          <div class="weather-details">
+            <div class="weather-detail">
+              <span>Ощущается как</span>
+              <strong id="weatherFeels">--°C</strong>
+            </div>
+            <div class="weather-detail">
+              <span>Влажность</span>
+              <strong id="weatherHumidity">--%</strong>
+            </div>
+            <div class="weather-detail">
+              <span>Ветер</span>
+              <strong id="weatherWind">-- км/ч</strong>
+            </div>
+            <div class="weather-detail">
+              <span>Осадки</span>
+              <strong id="weatherRain">-- мм</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- CTA -->
 
       <section class="cta" id="contact">
@@ -1056,6 +1245,98 @@
     </footer>
 
     <script>
+
+      /* =================================
+         LIVE WEATHER — TASHKENT
+      ================================= */
+
+      const weatherCodeText = {
+        0: "Ясное небо",
+        1: "Преимущественно ясно",
+        2: "Переменная облачность",
+        3: "Пасмурно",
+        45: "Туман",
+        48: "Изморозь и туман",
+        51: "Лёгкая морось",
+        53: "Морось",
+        55: "Сильная морось",
+        56: "Ледяная морось",
+        57: "Сильная ледяная морось",
+        61: "Небольшой дождь",
+        63: "Дождь",
+        65: "Сильный дождь",
+        66: "Ледяной дождь",
+        67: "Сильный ледяной дождь",
+        71: "Небольшой снег",
+        73: "Снег",
+        75: "Сильный снег",
+        77: "Снежные зёрна",
+        80: "Кратковременный дождь",
+        81: "Ливень",
+        82: "Сильный ливень",
+        85: "Небольшой снегопад",
+        86: "Сильный снегопад",
+        95: "Гроза",
+        96: "Гроза с градом",
+        99: "Сильная гроза с градом"
+      };
+
+      async function loadTashkentWeather() {
+        const errorElement = document.getElementById("weatherError");
+        const refreshButton = document.getElementById("weatherRefresh");
+
+        errorElement.textContent = "";
+        refreshButton.disabled = true;
+        refreshButton.textContent = "Загрузка...";
+
+        try {
+          const url = "https://api.open-meteo.com/v1/forecast" +
+            "?latitude=41.2995&longitude=69.2401" +
+            "&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m" +
+            "&timezone=Asia%2FTashkent";
+
+          const response = await fetch(url);
+          if (!response.ok) throw new Error("Не удалось получить данные о погоде");
+
+          const data = await response.json();
+          const current = data.current;
+
+          document.getElementById("weatherTemp").textContent =
+            `${Math.round(current.temperature_2m)}°`;
+          document.getElementById("weatherDescription").textContent =
+            weatherCodeText[current.weather_code] || "Погодные условия";
+          document.getElementById("weatherFeels").textContent =
+            `${Math.round(current.apparent_temperature)}°C`;
+          document.getElementById("weatherHumidity").textContent =
+            `${current.relative_humidity_2m}%`;
+          document.getElementById("weatherWind").textContent =
+            `${Math.round(current.wind_speed_10m)} км/ч`;
+          document.getElementById("weatherRain").textContent =
+            `${current.precipitation} мм`;
+
+          const updatedAt = new Date(current.time);
+          document.getElementById("weatherUpdated").textContent =
+            `Обновлено: ${updatedAt.toLocaleString("ru-RU", {
+              timeZone: "Asia/Tashkent",
+              dateStyle: "short",
+              timeStyle: "short"
+            })} (Ташкент)`;
+        } catch (error) {
+          errorElement.textContent =
+            "Не удалось загрузить погоду. Проверьте подключение к интернету и попробуйте ещё раз.";
+          document.getElementById("weatherDescription").textContent =
+            "Данные временно недоступны";
+        } finally {
+          refreshButton.disabled = false;
+          refreshButton.textContent = "Обновить погоду";
+        }
+      }
+
+      document.getElementById("weatherRefresh")
+        .addEventListener("click", loadTashkentWeather);
+
+      loadTashkentWeather();
+
       /* =================================
        CUSTOM CURSOR
     ================================= */
