@@ -1281,7 +1281,12 @@
         99: "Сильная гроза с градом"
       };
 
+      let weatherLoading = false;
+
       async function loadTashkentWeather() {
+        if (weatherLoading) return;
+        weatherLoading = true;
+
         const errorElement = document.getElementById("weatherError");
         const refreshButton = document.getElementById("weatherRefresh");
 
@@ -1295,7 +1300,7 @@
             "&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m" +
             "&timezone=Asia%2FTashkent";
 
-          const response = await fetch(url);
+          const response = await fetch(url, { cache: "no-store" });
           if (!response.ok) throw new Error("Не удалось получить данные о погоде");
 
           const data = await response.json();
@@ -1329,13 +1334,19 @@
         } finally {
           refreshButton.disabled = false;
           refreshButton.textContent = "Обновить погоду";
+          weatherLoading = false;
         }
       }
 
+      // Ручное обновление по нажатию кнопки
       document.getElementById("weatherRefresh")
         .addEventListener("click", loadTashkentWeather);
 
+      // Первая загрузка сразу при открытии сайта
       loadTashkentWeather();
+
+      // Автоматическое обновление каждые 60 секунд
+      setInterval(loadTashkentWeather, 60 * 1000);
 
       /* =================================
        CUSTOM CURSOR
